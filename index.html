@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zaza Vape & Smoke — 3912 Broadway Blvd, Kansas City</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;700;900&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --fuchsia:  #e040fb;
+      --fuchsia2: #f06aff;
+      --violet:   #7c3aed;
+      --violet2:  #9d5fff;
+      --gold:     #f5c842;
+      --gold2:    #ffd966;
+      --lime:     #a3e635;
+      --bg:       #08060e;
+      --bg2:      #0e0a1a;
+      --bg3:      #140f22;
+      --card:     #110e1e;
+      --text:     #f5f0ff;
+      --muted:    rgba(245,240,255,0.5);
+      --dim:      rgba(245,240,255,0.12);
+      --border:   rgba(245,240,255,0.07);
+      --glow-f:   rgba(224,64,251,0.2);
+      --glow-v:   rgba(124,58,237,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* scanline overlay */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.04) 3px,
+        rgba(0,0,0,0.04) 4px
+      );
+    }
+
+    /* ─── AGE GATE ─── */
+    .age-gate {
+      position: fixed; inset: 0; z-index: 9000;
+      background: var(--bg);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 40px;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
+    .age-gate.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    .ag-logo {
+      font-family: 'Unbounded', sans-serif; font-weight: 900;
+      font-size: clamp(3rem, 10vw, 7rem);
+      line-height: 1; margin-bottom: 6px;
+      background: linear-gradient(135deg, var(--fuchsia), var(--violet), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 30px rgba(224,64,251,0.4));
+    }
+    .ag-sub-brand {
+      font-family: 'Unbounded', sans-serif; font-weight: 300;
+      font-size: 0.8rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 44px;
+    }
+    .ag-question {
+      font-size: 1rem; color: var(--muted); margin-bottom: 32px; letter-spacing: 0.05em;
+    }
+    .ag-btns { display: flex; gap: 12px; }
+    .ag-yes {
+      font-family: 'Unbounded', sans-serif; font-weight: 700;
+      font-size: 0.75rem; letter-spacing: 0.06em;
+      padding: 15px 40px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, var(--fuchsia), var(--violet));
+      color: #fff; transition: opacity 0.2s, transform 0.2s;
+    }
+    .ag-yes:hover { opacity: 0.85; transform: translateY(-2px); }
+    .ag-no {
+      font-size: 0.82rem; letter-spacing: 0.06em;
+      padding: 15px 36px; background: transparent;
+      border: 1px solid var(--border); color: var(--muted); text-decoration: none;
+      transition: border-color 0.2s;
+    }
+    .ag-no:hover { border-color: var(--muted); }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 52px;
+      transition: background 0.3s, padding 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(8,6,14,0.97);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      padding: 13px 52px;
+    }
+    .nav-brand {
+      font-family: 'Unbounded', sans-serif; font-weight: 900;
+      font-size: 1.3rem; text-decoration: none; letter-spacing: 0.02em;
+      background: linear-gradient(90deg, var(--fuchsia), var(--violet));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.25s;
+    }
+    .nav-links a:hover { color: var(--fuchsia2); }
+    .nav-cta {
+      font-family: 'Unbounded', sans-serif; font-weight: 700;
+      font-size: 0.7rem; letter-spacing: 0.06em;
+      padding: 10px 22px; text-decoration: none; color: #fff;
+      background: linear-gradient(135deg, var(--fuchsia), var(--violet));
+      transition: opacity 0.2s;
+    }
+    .nav-cta:hover { opacity: 0.85; }
+
+    /* ─── HERO ─── */
+    #hero {
+      min-height: 100vh; position: relative; z-index: 1;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 140px 52px 80px; overflow: hidden;
+    }
+
+    .hero-aura {
+      position: absolute; inset: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 55% 50% at 80% 50%, rgba(224,64,251,0.14) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 45% at 10% 30%, rgba(124,58,237,0.1) 0%, transparent 55%),
+        radial-gradient(ellipse 30% 35% at 60% 90%, rgba(245,200,66,0.06) 0%, transparent 50%);
+    }
+
+    /* Y2K star field */
+    .star-field {
+      position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+    }
+    .star {
+      position: absolute; border-radius: 50%;
+      background: #fff; animation: twinkle ease-in-out infinite;
+    }
+    @keyframes twinkle {
+      0%,100% { opacity: 0.1; transform: scale(1); }
+      50%      { opacity: 0.6; transform: scale(1.3); }
+    }
+
+    /* floating gradient orbs */
+    .orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(80px); pointer-events: none; opacity: 0.25;
+      animation: orbFloat ease-in-out infinite;
+    }
+    @keyframes orbFloat {
+      0%,100% { transform: translateY(0) scale(1); }
+      50%      { transform: translateY(-30px) scale(1.05); }
+    }
+
+    .hero-tag {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 0.72rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 28px; position: relative; z-index: 2;
+      opacity: 0; animation: fadeUp 0.7s 0.2s forwards;
+    }
+    .hero-tag::before {
+      content: '';
+      width: 24px; height: 1px; background: var(--gold);
+    }
+
+    .hero-title {
+      font-family: 'Unbounded', sans-serif; font-weight: 900;
+      font-size: clamp(4rem, 12vw, 11rem);
+      line-height: 0.88; letter-spacing: -0.02em;
+      position: relative; z-index: 2;
+      opacity: 0; animation: fadeUp 0.85s 0.35s forwards;
+    }
+    .hero-title .grad {
+      background: linear-gradient(90deg, var(--fuchsia), var(--violet2), var(--fuchsia2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(224,64,251,0.3));
+    }
+    .hero-title .ghost {
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(245,240,255,0.18);
+    }
+    .hero-title .gold-line {
+      display: block;
+      background: linear-gradient(90deg, var(--gold), var(--gold2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 1rem; line-height: 1.8; color: var(--muted);
+      max-width: 480px; margin-top: 30px; position: relative; z-index: 2;
+      opacity: 0; animation: fadeUp 0.7s 0.7s forwards;
+    }
+    .hero-desc strong { color: var(--text); font-weight: 500; }
+
+    .hero-row {
+      display: flex; align-items: center; gap: 20px; margin-top: 44px;
+      position: relative; z-index: 2;
+      opacity: 0; animation: fadeUp 0.7s 0.9s forwards;
+    }
+    .btn-fuchsia {
+      font-family: 'Unbounded', sans-serif; font-weight: 700;
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      padding: 16px 36px; text-decoration: none; color: #fff;
+      background: linear-gradient(135deg, var(--fuchsia), var(--violet));
+      transition: opacity 0.2s, transform 0.2s;
+      position: relative; overflow: hidden;
+    }
+    .btn-fuchsia::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.1) 100%);
+    }
+    .btn-fuchsia:hover { opacity: 0.85; transform: translateY(-2px); }
+    .btn-outline-f {
+      font-family: 'Unbounded', sans-serif; font-weight: 400;
+      font-size: 0.72rem; letter-spacing: 0.06em;
+      padding: 16px 36px; text-decoration: none;
+      color: var(--fuchsia2);
+      border: 1px solid rgba(224,64,251,0.35);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .btn-outline-f:hover { border-color: var(--fuchsia); background: rgba(224,64,251,0.08); }
+
+    .hero-address {
+      position: absolute; right: 52px; bottom: 80px; z-index: 2;
+      text-align: right;
+      opacity: 0; animation: fadeUp 0.7s 1.1s forwards;
+    }
+    .ha-line {
+      font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--muted); line-height: 2;
+    }
+    .ha-line strong { color: var(--fuchsia2); }
+
+    /* ─── MARQUEE ─── */
+    .marquee-wrap {
+      overflow: hidden; padding: 16px 0; position: relative; z-index: 2;
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .marquee-track {
+      display: inline-flex; gap: 0;
+      animation: marqueeGo 24s linear infinite;
+      white-space: nowrap;
+    }
+    .mq-item {
+      display: inline-block; padding: 0 30px;
+      font-family: 'Unbounded', sans-serif; font-weight: 300;
+      font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .mq-item.f { color: var(--fuchsia2); }
+    .mq-item.v { color: var(--violet2); }
+    .mq-item.g { color: var(--gold); }
+    .mq-item.l { color: var(--lime); }
+    .mq-item.sep { color: var(--dim); }
+    @keyframes marqueeGo { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ─── SHARED ─── */
+    .label {
+      font-family: 'Unbounded', sans-serif; font-weight: 300;
+      font-size: 0.58rem; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--fuchsia); margin-bottom: 14px; display: block;
+    }
+    .heading {
+      font-family: 'Unbounded', sans-serif; font-weight: 900;
+      font-size: clamp(2rem, 4.5vw, 4rem);
+      line-height: 1; letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+    .heading .f { color: var(--fuchsia); }
+    .heading .g { color: var(--gold); }
+    .heading .l { color: var(--lime); }
+    .rule { width: 44px; height: 3px; margin-bottom: 24px; }
+    .rule-f { background: linear-gradient(90deg, var(--fuchsia), var(--violet)); }
+    .rule-g { background: linear-gradient(90deg, var(--gold), var(--fuchsia)); }
+    .copy { font-size: 0.95rem; line-height: 1.85; color: var(--muted); }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.in { opacity: 1; transform: translateY(0); }
+
+    /* ─── VIBE STRIP ─── */
+    #vibe {
+      padding: 100px 52px; position: relative; z-index: 1;
+      max-width: 1400px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .vibe-glass {
+      background: var(--card); border: 1px solid var(--border);
+      aspect-ratio: 3/4; position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 40px;
+    }
+    .vibe-glass-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(224,64,251,0.08) 0%, rgba(124,58,237,0.12) 50%, rgba(245,200,66,0.04) 100%);
+    }
+    .vibe-glass-text {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-family: 'Unbounded', sans-serif; font-weight: 900;
+      font-size: 7rem; line-height: 1; text-align: center;
+      background: linear-gradient(135deg, rgba(224,64,251,0.12), rgba(124,58,237,0.08));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      user-select: none; white-space: nowrap;
+    }
+    .vibe-corner-tl, .vibe-corner-br {
+      position: absolute; width: 32px; height: 32px;
+    }
+    .vibe-corner-tl {
+      top: 16px; left: 16px;
+      border-top: 2px solid var(--fuchsia); border-left: 2px solid var(--fuchsia);
+    }
+    .vibe-corner-br {
+      bottom: 16px; right: 16px;
+      border-bottom: 2px solid var(--gold); border-right: 2px solid var(--gold);
+    }
+    .vibe-badge {
+      position: relative; z-index: 2;
+      font-family: 'Unbounded', sans-serif; font-weight: 700;
+      font-size: 1rem; line-height: 1.3;
+    }
+    .vibe-badge-sub {
+      font-family: 'Outfit', sans-serif; font-size: 0.78rem;
+      color: var(--muted); margin-top: 8px; font-weight: 300;
+    }
+    .vibe-float-tag {
+      position: absolute; top: 24px; right: -10px;
+      background: var(--gold); color: var(--bg);
+      font-family: 'Unbounded', sans-serif; font-weight: 700;
+      font-size: 0.65rem; letter-spacing: 0.1em; padding: 10px 18px;
+    }
+
+    .vibe-pillars { display: flex; flex-direction: column; gap: 0; }
+    .vibe-pillar {
+      padding: 28px 0; border-bottom: 1px solid var(--border);
+      display: flex; gap: 20px; align-items: flex-start;
+      transition: padding-left 0.3s;
+    }
+    .vibe-pillar:hover { padding-left: 10px; }
+    .vp-num {
+      font-family: 'Unbounded', sans-serif; font-weight: 900;
+      font-size: 0.6rem; color: var(--fuchsia); flex-shrink: 0; padding-top: 4px;
+    }
+    .vp-title { font-weight: 600; font-size: 1rem; margin-bottom: 6px; }
+    .vp-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+
+    /* ─── PRODUCTS ─── */
+    #products {
+      background: var(--bg2); padding: 100px 52px;
+      position: relative; z-index: 1; overflow: hidden;
+    }
+    #products::before {
+      content: 'ZAZA';
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-family: 'Unbounded', sans-serif; font-weight: 900;
+      font-size: 28vw; letter-spacing: -0.04em;
+      background: linear-gradient(135deg, rgba(224,64,251,0.03), rgba(124,58,237,0.03));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      pointer-events: none; user-select: none; white-space: nowrap;
+    }
+    .prod-head {
+      text-align: center; max-width: 700px; margin: 0 auto 70px;
+      position: relative; z-index: 2;
+    }
+    .prod-head .rule { margin: 0 auto 24px; }
+
+    .prod-mosaic {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto auto;
+      gap: 2px; max-width: 1400px; margin: 0 auto;
+      position: relative; z-index: 2;
+    }
+    .p-cell {
+      background: var(--card); padding: 40px 32px;
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .p-cell:hover { background: var(--bg3); border-color: rgba(224,64,251,0.2); }
+    .p-cell.span2 { grid-column: span 2; }
+    .p-cell::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      transform: scaleX(0); transform-origin: left; transition: transform 0.4s;
+    }
+    .p-cell:hover::after { transform: scaleX(1); }
+    .p-cell.c-f::after { background: linear-gradient(90deg, var(--fuchsia), var(--violet)); }
+    .p-cell.c-g::after { background: linear-gradient(90deg, var(--gold), var(--fuchsia)); }
+    .p-cell.c-l::after { background: linear-gradient(90deg, var(--lime), var(--gold)); }
+    .p-cell.c-v::after { background: linear-gradient(90deg, var(--violet), var(--fuchsia)); }
+
+    .p-emoji { font-size: 2rem; display: block; margin-bottom: 18px; }
+    .p-name {
+      font-family: 'Unbounded', sans-serif; font-weight: 700;
+      font-size: 0.9rem; letter-spacing: 0.02em; margin-bottom: 10px;
+    }
+    .p-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.75; }
+    .p-tag {
+      display: inline-block; margin-top: 14px;
+      font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--fuchsia); border: 1px solid rgba(224,64,251,0.25); padding: 4px 10px;
+    }
+    .p-cell.c-g .p-tag { color: var(--gold); border-color: rgba(245,200,66,0.25); }
+    .p-cell.c-l .p-tag { color: var(--lime); border-color: rgba(163,230,53,0.25); }
+
+    /* ─── HOURS & LOCATION ─── */
+    #visit {
+      padding: 100px 52px; position: relative; z-index: 1;
+      max-width: 1400px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 100px;
+    }
+
+    .h-list { margin-top: 32px; }
+    .h-row {
+      display: flex; align-items: center; padding: 16px 0;
+      border-bottom: 1px solid var(--border); gap: 10px;
+    }
+    .h-day {
+      font-family: 'Unbounded', sans-serif; font-weight: 300;
+      font-size: 0.68rem; letter-spacing: 0.12em; color: var(--muted);
+      width: 120px; flex-shrink: 0;
+    }
+    .h-time { font-size: 0.92rem; color: var(--text); flex: 1; }
+    .h-pill {
+      font-size: 0.5rem; letter-spacing: 0.18em; padding: 3px 9px; flex-shrink: 0;
+      font-family: 'Unbounded', sans-serif; font-weight: 600;
+    }
+    .pill-hot { background: rgba(224,64,251,0.12); color: var(--fuchsia); border: 1px solid rgba(224,64,251,0.25); }
+    .pill-now { background: linear-gradient(135deg, var(--fuchsia), var(--violet)); color: #fff; }
+    .h-row.today .h-day { color: var(--fuchsia2); font-weight: 600; }
+    .h-row.today .h-time { color: var(--fuchsia2); }
+
+    .h-notes { margin-top: 26px; display: flex; flex-direction: column; gap: 11px; }
+    .h-note {
+      display: flex; gap: 10px; align-items: flex-start;
+      font-size: 0.83rem; color: var(--muted); line-height: 1.65;
+    }
+    .h-note-sym { color: var(--fuchsia); flex-shrink: 0; font-size: 0.7rem; margin-top: 3px; }
+    .h-note strong { color: var(--text); }
+
+    .loc-stack { display: flex; flex-direction: column; gap: 24px; margin-top: 32px; }
+    .loc-row { display: flex; gap: 18px; align-items: flex-start; }
+    .loc-icon {
+      width: 46px; height: 46px; flex-shrink: 0;
+      background: rgba(224,64,251,0.08); border: 1px solid rgba(224,64,251,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .loc-key {
+      font-family: 'Unbounded', sans-serif; font-weight: 300;
+      font-size: 0.54rem; letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--fuchsia); margin-bottom: 4px;
+    }
+    .loc-val { font-size: 0.95rem; color: var(--text); line-height: 1.55; }
+    .loc-val a { color: var(--text); text-decoration: none; transition: color 0.2s; }
+    .loc-val a:hover { color: var(--fuchsia2); }
+
+    .map-box {
+      margin-top: 28px; height: 280px;
+      border: 1px solid rgba(224,64,251,0.15); overflow: hidden;
+      filter: grayscale(100%) brightness(0.45) contrast(1.2);
+      transition: filter 0.4s;
+    }
+    .map-box:hover { filter: grayscale(20%) brightness(0.65) contrast(1.1) hue-rotate(260deg); }
+    .map-box iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    /* ─── BOTTOM CTA ─── */
+    #cta {
+      padding: 110px 52px; text-align: center; position: relative; z-index: 1;
+      background: var(--bg2); overflow: hidden;
+    }
+    .cta-aura {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 65% 60% at 50% 50%, rgba(224,64,251,0.1) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .cta-inner { position: relative; z-index: 2; max-width: 750px; margin: 0 auto; }
+    .cta-head {
+      font-family: 'Unbounded', sans-serif; font-weight: 900;
+      font-size: clamp(2.5rem, 7vw, 6.5rem);
+      line-height: 0.92; letter-spacing: -0.03em; margin-bottom: 24px;
+    }
+    .cta-head .f-grad {
+      background: linear-gradient(90deg, var(--fuchsia), var(--violet2), var(--fuchsia2));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 24px rgba(224,64,251,0.35));
+    }
+    .cta-body { font-size: 1rem; color: var(--muted); margin-bottom: 44px; line-height: 1.75; }
+    .cta-btns { display: flex; gap: 14px; justify-content: center; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #040309; border-top: 1px solid var(--border);
+      padding: 36px 52px; position: relative; z-index: 1;
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 18px;
+    }
+    .footer-brand {
+      font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: 1rem;
+      background: linear-gradient(90deg, var(--fuchsia), var(--violet));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); text-decoration: none; transition: color 0.25s;
+    }
+    .footer-links a:hover { color: var(--fuchsia2); }
+    .footer-copy { font-size: 0.6rem; color: var(--dim); letter-spacing: 0.1em; text-transform: uppercase; }
+
+    /* ─── ANIMS ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(22px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 960px) {
+      nav { padding: 14px 20px; }
+      nav.scrolled { padding: 10px 20px; }
+      .nav-links { display: none; }
+      #hero { padding: 130px 20px 70px; }
+      .hero-address { display: none; }
+      #vibe, #visit { grid-template-columns: 1fr; gap: 50px; }
+      #vibe, #products, #visit, #cta { padding: 80px 20px; }
+      .prod-mosaic { grid-template-columns: 1fr 1fr; }
+      .p-cell.span2 { grid-column: span 1; }
+      .cta-btns { flex-direction: column; align-items: center; }
+      footer { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Age Gate -->
+<div class="age-gate" id="ageGate">
+  <div class="ag-logo">ZAZA</div>
+  <div class="ag-sub-brand">Vape &amp; Smoke · Kansas City</div>
+  <div class="ag-question">Are you 21 or older?</div>
+  <p style="font-size:0.82rem;color:var(--muted);margin-bottom:32px;max-width:360px;margin-left:auto;margin-right:auto">This site contains tobacco and vape products. Valid ID required in store.</p>
+  <div class="ag-btns">
+    <button class="ag-yes" onclick="document.getElementById('ageGate').classList.add('gone')">Yes, I'm 21+</button>
+    <a class="ag-no" href="https://google.com">Exit</a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <a href="#hero" class="nav-brand">ZAZA</a>
+  <ul class="nav-links">
+    <li><a href="#vibe">About</a></li>
+    <li><a href="#products">Products</a></li>
+    <li><a href="#visit">Hours</a></li>
+  </ul>
+  <a href="tel:8162161931" class="nav-cta">Call Now</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-aura"></div>
+  <div class="star-field" id="starField"></div>
+  <div class="orb" style="width:500px;height:500px;background:var(--fuchsia);right:-150px;top:50%;transform:translateY(-50%);animation-duration:8s"></div>
+  <div class="orb" style="width:350px;height:350px;background:var(--violet);left:-80px;top:20%;animation-duration:11s;animation-delay:-3s"></div>
+
+  <div class="hero-tag">3912 Broadway Blvd · Kansas City, MO</div>
+  <h1 class="hero-title">
+    <span class="grad">ZAZA</span><br/>
+    <span class="ghost">VAPE &</span><br/>
+    <span class="gold-line">SMOKE</span>
+  </h1>
+  <p class="hero-desc">
+    <strong>Kansas City's vibe shop.</strong> Vapes, glass, Delta 8, THC, CBD, Kratom, wraps, and everything else — curated for the culture, priced right, right on Broadway in Westport.
+  </p>
+  <div class="hero-row">
+    <a href="tel:8162161931" class="btn-fuchsia">📞 (816) 216-1931</a>
+    <a href="#products" class="btn-outline-f">See Products</a>
+  </div>
+
+  <div class="hero-address">
+    <div class="ha-line"><strong>3912 Broadway Blvd</strong></div>
+    <div class="ha-line">Kansas City, MO 64111</div>
+    <div class="ha-line" style="margin-top:6px"><strong>(816) 216-1931</strong></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="mq-item f">Vapes & Disposables</span><span class="mq-item sep">★</span>
+    <span class="mq-item v">Glass & Pipes</span><span class="mq-item sep">★</span>
+    <span class="mq-item g">Delta 8 & THC</span><span class="mq-item sep">★</span>
+    <span class="mq-item l">Kratom</span><span class="mq-item sep">★</span>
+    <span class="mq-item f">CBD Products</span><span class="mq-item sep">★</span>
+    <span class="mq-item v">Wraps & Papers</span><span class="mq-item sep">★</span>
+    <span class="mq-item g">3912 Broadway KC</span><span class="mq-item sep">★</span>
+    <span class="mq-item l">Dab Rigs</span><span class="mq-item sep">★</span>
+    <span class="mq-item f">Accessories</span><span class="mq-item sep">★</span>
+    <span class="mq-item v">21+ Only</span><span class="mq-item sep">★</span>
+    <!-- repeat -->
+    <span class="mq-item f">Vapes & Disposables</span><span class="mq-item sep">★</span>
+    <span class="mq-item v">Glass & Pipes</span><span class="mq-item sep">★</span>
+    <span class="mq-item g">Delta 8 & THC</span><span class="mq-item sep">★</span>
+    <span class="mq-item l">Kratom</span><span class="mq-item sep">★</span>
+    <span class="mq-item f">CBD Products</span><span class="mq-item sep">★</span>
+    <span class="mq-item v">Wraps & Papers</span><span class="mq-item sep">★</span>
+    <span class="mq-item g">3912 Broadway KC</span><span class="mq-item sep">★</span>
+    <span class="mq-item l">Dab Rigs</span><span class="mq-item sep">★</span>
+    <span class="mq-item f">Accessories</span><span class="mq-item sep">★</span>
+    <span class="mq-item v">21+ Only</span><span class="mq-item sep">★</span>
+  </div>
+</div>
+
+<!-- VIBE -->
+<section id="vibe">
+  <div class="reveal">
+    <div class="vibe-glass">
+      <div class="vibe-glass-bg"></div>
+      <div class="vibe-glass-text">ZZ</div>
+      <div class="vibe-corner-tl"></div>
+      <div class="vibe-corner-br"></div>
+      <div class="vibe-float-tag">Broadway, KC</div>
+      <div class="vibe-badge">
+        <div style="background:linear-gradient(90deg,var(--fuchsia),var(--violet));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.5rem">Vape & Smoke</div>
+        <div class="vibe-badge-sub">3912 Broadway Blvd · Kansas City</div>
+      </div>
+    </div>
+  </div>
+  <div class="reveal" style="transition-delay:0.2s">
+    <span class="label">// the spot</span>
+    <h2 class="heading">Built for the <span class="f">Culture.</span></h2>
+    <div class="rule rule-f"></div>
+    <p class="copy" style="margin-bottom:18px">Right on Broadway in the Westport area, Zaza Vape & Smoke is the shop that gets it. We're not just stocked — we're curated. Every product we carry is here because it's good, and we'll tell you exactly why.</p>
+    <p class="copy">From top-shelf disposables to Kratom, Delta 8, premium glass, and everything in between — if you know what you want, we have it. If you're not sure, we'll figure it out together.</p>
+    <div class="vibe-pillars" style="margin-top:36px">
+      <div class="vibe-pillar">
+        <div class="vp-num">01</div>
+        <div>
+          <div class="vp-title">Fully Stocked, Always</div>
+          <p class="vp-desc">We keep shelves loaded with the products people actually want — not dusty old stock. Fresh inventory, top brands.</p>
+        </div>
+      </div>
+      <div class="vibe-pillar">
+        <div class="vp-num">02</div>
+        <div>
+          <div class="vp-title">Staff Who Know Their Stuff</div>
+          <p class="vp-desc">Ask anything. We know the products, we know the difference between them, and we'll steer you right every time.</p>
+        </div>
+      </div>
+      <div class="vibe-pillar">
+        <div class="vp-num">03</div>
+        <div>
+          <div class="vp-title">Westport's Best-Kept Secret</div>
+          <p class="vp-desc">3912 Broadway — steps from the action. Easy in, easy out. The shop worth finding.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRODUCTS -->
+<section id="products">
+  <div class="prod-head reveal">
+    <span class="label">// what we carry</span>
+    <h2 class="heading">The <span class="f">Full</span> Menu</h2>
+    <div class="rule rule-f"></div>
+    <p class="copy">Everything you need, none of what you don't. One stop.</p>
+  </div>
+  <div class="prod-mosaic reveal">
+    <div class="p-cell c-f">
+      <span class="p-emoji">💨</span>
+      <div class="p-name">Vapes & Disposables</div>
+      <p class="p-desc">Every top brand — Elf Bar, Lost Mary, Geek Bar, Puff Bar, and more. Pods, mods, and nic salts all day.</p>
+      <span class="p-tag">Top Sellers</span>
+    </div>
+    <div class="p-cell c-v">
+      <span class="p-emoji">🔮</span>
+      <div class="p-name">Glass & Bongs</div>
+      <p class="p-desc">Hand pipes, water pipes, bubblers, and scientific glass. All sizes, all styles, all price points.</p>
+      <span class="p-tag">Wide Range</span>
+    </div>
+    <div class="p-cell c-g span2">
+      <span class="p-emoji">🌿</span>
+      <div class="p-name">Delta 8, Delta 10 & THC Products</div>
+      <p class="p-desc">Gummies, carts, tinctures, flower — all tested, all legit. We carry the brands that deliver and we know exactly what each one does.</p>
+      <span class="p-tag">Lab Tested</span>
+    </div>
+    <div class="p-cell c-l span2">
+      <span class="p-emoji">🌱</span>
+      <div class="p-name">Kratom & CBD</div>
+      <p class="p-desc">Premium Kratom strains — Maeng Da, Bali, and more — in powders, capsules, and extract. CBD oils, flower, and concentrates for every preference.</p>
+      <span class="p-tag">Knowledgeable Staff</span>
+    </div>
+    <div class="p-cell c-f">
+      <span class="p-emoji">💎</span>
+      <div class="p-name">Dab Rigs & Concentrates</div>
+      <p class="p-desc">Rigs, nails, torches, carb caps, and everything for CBD dab sessions done right.</p>
+      <span class="p-tag">Specialty</span>
+    </div>
+    <div class="p-cell c-v">
+      <span class="p-emoji">📜</span>
+      <div class="p-name">Wraps & Papers</div>
+      <p class="p-desc">Blunt wraps, bud wraps, rolling papers, cones — every brand, every flavor you're looking for.</p>
+      <span class="p-tag">Always Stocked</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOURS & LOCATION -->
+<section id="visit">
+  <div class="reveal">
+    <span class="label">// hours</span>
+    <h2 class="heading">When We're <span class="f">Open</span></h2>
+    <div class="rule rule-f"></div>
+    <div class="h-list" id="hoursList"></div>
+    <div class="h-notes">
+      <div class="h-note"><span class="h-note-sym">★</span><span><strong>Open 7 days a week</strong> — consistent hours you can count on, every day.</span></div>
+      <div class="h-note"><span class="h-note-sym">★</span><span><strong>21+ with valid photo ID</strong> required at the door, no exceptions.</span></div>
+      <div class="h-note"><span class="h-note-sym">★</span><span><strong>Questions before you come in?</strong> Call us: <strong>(816) 216-1931</strong></span></div>
+      <div class="h-note"><span class="h-note-sym">★</span><span><strong>Don't see your product?</strong> Ask — we'll do our best to stock it for you.</span></div>
+    </div>
+  </div>
+  <div class="reveal" style="transition-delay:0.2s">
+    <span class="label">// location</span>
+    <h2 class="heading">Find <span class="g">Zaza</span></h2>
+    <div class="rule rule-g"></div>
+    <div class="loc-stack">
+      <div class="loc-row">
+        <div class="loc-icon">📍</div>
+        <div>
+          <div class="loc-key">Address</div>
+          <div class="loc-val">3912 Broadway Blvd<br/>Kansas City, MO 64111</div>
+        </div>
+      </div>
+      <div class="loc-row">
+        <div class="loc-icon">📞</div>
+        <div>
+          <div class="loc-key">Phone</div>
+          <div class="loc-val"><a href="tel:8162161931">(816) 216-1931</a></div>
+        </div>
+      </div>
+      <div class="loc-row">
+        <div class="loc-icon">📍</div>
+        <div>
+          <div class="loc-key">Neighborhood</div>
+          <div class="loc-val">Broadway · Westport Area · KC</div>
+        </div>
+      </div>
+    </div>
+    <div class="map-box">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d500!2d-94.5911322!3d39.0562567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x87c0ef57d0b703e7%3A0x2da115cc9f85a9f8!2szaza%20vape%20%26%20smoke!5e0!3m2!1sen!2sus!4v1"
+        allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <div class="cta-aura"></div>
+  <div class="cta-inner reveal">
+    <h2 class="cta-head">
+      Come<br/><span class="f-grad">Through.</span>
+    </h2>
+    <p class="cta-body">3912 Broadway Blvd — in the Westport area of Kansas City. Whatever you need, we've got it. Come see what the vibe is about.</p>
+    <div class="cta-btns">
+      <a href="tel:8162161931" class="btn-fuchsia">📞 (816) 216-1931</a>
+      <a href="https://maps.google.com/?q=Zaza+Vape+Smoke+Kansas+City" target="_blank" class="btn-outline-f">Get Directions</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">ZAZA VAPE & SMOKE</div>
+    <div class="footer-links">
+      <a href="#vibe">About</a>
+      <a href="#products">Products</a>
+      <a href="#visit">Hours</a>
+    </div>
+    <div class="footer-copy">© 2026 Zaza Vape & Smoke · 3912 Broadway Blvd · Kansas City, MO · 21+</div>
+  </div>
+</footer>
+
+<script>
+  // Nav
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60));
+
+  // Reveal
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); obs.unobserve(e.target); } });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+  // Stars
+  const sf = document.getElementById('starField');
+  for (let i = 0; i < 80; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const size = 1 + Math.random() * 2.5;
+    s.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random()*100}%; top:${Math.random()*100}%;
+      animation-duration:${2 + Math.random()*4}s;
+      animation-delay:-${Math.random()*4}s;
+    `;
+    sf.appendChild(s);
+  }
+
+  // Hours — update once confirmed; using reasonable KC smoke shop hours
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const today = days[new Date().getDay()];
+  const hoursData = [
+    { day:'Monday',    open:'10:00 AM', close:'9:00 PM',  hot:false },
+    { day:'Tuesday',   open:'10:00 AM', close:'9:00 PM',  hot:false },
+    { day:'Wednesday', open:'10:00 AM', close:'9:00 PM',  hot:false },
+    { day:'Thursday',  open:'10:00 AM', close:'9:00 PM',  hot:false },
+    { day:'Friday',    open:'10:00 AM', close:'10:00 PM', hot:true  },
+    { day:'Saturday',  open:'10:00 AM', close:'10:00 PM', hot:true  },
+    { day:'Sunday',    open:'11:00 AM', close:'8:00 PM',  hot:false },
+  ];
+
+  const list = document.getElementById('hoursList');
+  hoursData.forEach(h => {
+    const isToday = h.day === today;
+    list.innerHTML += `
+      <div class="h-row${isToday ? ' today' : ''}">
+        <span class="h-day">${h.day}</span>
+        <span class="h-time">${h.open} — ${h.close}</span>
+        ${h.hot ? '<span class="h-pill pill-hot">Late Night</span>' : ''}
+        ${isToday ? '<span class="h-pill pill-now">Open Now</span>' : ''}
+      </div>`;
+  });
+</script>
+</body>
+</html>
